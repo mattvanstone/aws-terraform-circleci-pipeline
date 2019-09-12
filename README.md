@@ -1,7 +1,9 @@
 # aws-terraform-circleci-pipeline
 This is a basic CI/CD pipeline template for projects using AWS, Terraform, and CircleCI. It supports a develop branch for non-prod and a master branch for production. Commits to develop or master will run terraform apply on the associated context. Commits to any other branch will run terraform plan against the develop context. The promotion through environments is any to develop to master.
 
-This template assumes the resources in develop and master are identical.
+## Assumptions
+- All of the resources in development and prod are identical
+- After setting up the pipeline you never intend to run terraform destroy. Since this pipeline creates the backend resources destroy will fail unless you first move to a local backend.
 
 ## Prerequisites
 - CircleCI setup and linked to GitHub.
@@ -27,3 +29,11 @@ Only the CircleCI config has been implemented so far.
 - Create Terraform for backend
 - Create sample resources
 - Document setup instructions
+
+## Setup
+- backend-resources.tf: Set aws_s3_bucket.tf-state-bucket.bucket and aws_dynamodb_table.tf-state-table.name
+- backend.tf: Set bucket and dynamodb_table attributes
+- rename backend.tf to backend
+- run terraform init && terraform apply
+- after successful apply rename backend to backend.tf
+- run terraform init -force-copy
