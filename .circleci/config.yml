@@ -1,0 +1,122 @@
+version: 2.1
+
+# Defaults for this pipeline
+terraform: &terraform
+    docker:
+      - image: hashicorp/terraform:0.12.7
+
+prod-context: &prod-context
+  context: production
+
+dev-context: &dev-context
+  context: development
+
+requires: &requires # If custom requires are needed this anchor reference on the job needs to be replaced with a local declaration
+  requires:
+    - repo-supervisor
+
+jobs:
+  repo-supervisor:
+    docker:
+      - image: node:8-stretch
+    steps:
+      - checkout 
+      - run:
+          name: Install repo-supervisor
+          command: |-
+            cd ../ && git clone https://github.com/auth0/repo-supervisor.git && cd repo-supervisor
+            npm install --no-optional
+            npm run build
+      - run:
+          name: Run repo-supervisor
+          command: cd ../repo-supervisor && npm run cli ../project/
+
+  # Runs terraform plan against the production environment
+  prod_plan:
+    <<: *terraform
+    steps:
+    - checkout
+    - run:
+        name: terraform init 
+        command: terraform init -input=false -backend-config=prod.tfbackend
+    - run:
+        name: terraform plan
+        command: terraform plan -var="env=prod" -input=false
+
+  # Initializes and runs Terraform in the prod environment
+  prod_deploy:
+    <<: *terraform
+    steps:
+      - checkout
+      - run: terraform init -backend-config=prod.tfbackend
+      - run: terraform apply -auto-approve -var="env=prod"
+
+  # Initializes and runs Terraform in the dev environment
+  dev_deploy:
+    <<: *terraform
+    steps:
+      - checkout
+      - run: terraform init -backend-config=dev.tfbackend
+      - run: terraform apply -auto-approve -var="env=dev"
+
+  # Runs terraform plan with detailed exitcode to detect drift
+  detectdrift:
+    <<: *terraform
+    steps:
+      - checkout
+      - run: terraform init
+      - run: 
+          name: terraform plan
+          command: terraform plan -detailed-exitcode 
+
+workflows:
+    flow:
+        jobs:
+            - repo-supervisor
+            - prod_plan:
+                <<: *prod-context
+                # Runs prod_plan on changes all branches but master. This will help understand the impact of apply before merging with master.
+                filters:
+                  branches:
+                     ignore:
+                       - master
+                <<: *requires
+            - prod_deploy:
+                <<: *prod-context
+                # Only run this job on the master branch
+                filters:
+                  branches:
+                     only:
+                       - master
+                <<: *requires
+            - dev_deploy:
+                <<: *dev-context
+                # Only run this job on the master branch
+                filters:
+                  branches:
+                     only:
+                       - develop
+                <<: *requires
+            - dev_plan:
+                <<: *dev-context
+                # Run this on any branch except master and develop to see the plan before merging with develop
+                filters:
+                  branches:
+                     ignore:
+                       - master
+                       - develop
+                <<: *requires
+  
+    # A scheduled workflow to run daily to detect drift. Will fail if state does not match the real environment.
+    driftdetect:
+        triggers:
+          - schedule:
+              # scheduled for 2pm UTC or 8am MT
+              cron: "0 14 * * *"
+              filters:
+                branches:
+                  only:
+                    - master
+        jobs:
+            - detectdrift:
+                <<: *prod-context
