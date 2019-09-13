@@ -3,12 +3,13 @@
 ################
 resource "aws_s3_bucket" "tf-state-bucket" {
   # Update backend.tf with new value
-  bucket = "[pipeline-name]-dev-state-bucket"
+  bucket        = "${lower(lookup(var.common_tags, "pipeline"))}-${var.env}-state-bucket"
+  force_destroy = true
+  acl           = "private"
+  tags          = "${var.common_tags}"
   versioning {
     enabled = true
   }
-  acl = "private"
-  tags = "${var.common_tags}"
 }
 
 ########################
@@ -16,7 +17,7 @@ resource "aws_s3_bucket" "tf-state-bucket" {
 ########################
 resource "aws_dynamodb_table" "tf-state-table" {
   # Update backend.tf with new value
-  name         = "[pipeline-name]-dev-state-table"
+  name         = "${lower(lookup(var.common_tags, "pipeline"))}-${var.env}-state-table"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "LockID"
   attribute {
