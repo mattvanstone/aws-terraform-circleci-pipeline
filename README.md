@@ -31,9 +31,18 @@ Only the CircleCI config has been implemented so far.
 - Document setup instructions
 
 ## Setup
-- backend-resources.tf: Set aws_s3_bucket.tf-state-bucket.bucket and aws_dynamodb_table.tf-state-table.name
-- backend.tf: Set bucket and dynamodb_table attributes
-- rename backend.tf to backend
-- run terraform init && terraform apply
-- after successful apply rename backend to backend.tf
-- run terraform init -force-copy
+1. Set the pipeline tag in variables.tf to the name of the project. This tag is used to name the backend resources in backend-resources.tf
+2. Modify dev.tfbackend and prod.tfbackend and set the bucket and dynamodb_table values to match the name 
+2. Login to the dev AWS account with the AWS cli or set the access key environment variables.
+3. Initialize terraform and apply the backend resources with a local state then move the state to the the created bucket.
+```
+mv backend.tf backend
+terraform init
+terraform apply -auto-approve -var="env=dev"
+mv backend backend.tf
+terraform init -force-copy -backend-config=dev.tfbackend
+```
+4. Login to the prod AWS account with the cli or set the access key environment variables.
+5. Repeat step 3 replacing "dev" with "prod"
+
+The backends for dev and prod are now created with remote states. 
