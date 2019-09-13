@@ -43,6 +43,18 @@ jobs:
         name: terraform plan
         command: terraform plan -var="env=prod" -input=false
 
+  # Runs terraform plan against the production environment
+  dev_plan:
+    <<: *terraform
+    steps:
+    - checkout
+    - run:
+        name: terraform init 
+        command: terraform init -input=false -backend-config=dev.tfbackend
+    - run:
+        name: terraform plan
+        command: terraform plan -var="env=dev" -input=false
+
   # Initializes and runs Terraform in the prod environment
   prod_deploy:
     <<: *terraform
