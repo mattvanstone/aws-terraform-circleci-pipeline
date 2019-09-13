@@ -90,8 +90,8 @@ workflows:
                 # Runs prod_plan on changes all branches but master. This will help understand the impact of apply before merging with master.
                 filters:
                   branches:
-                     ignore:
-                       - master
+                    only:
+                      - develop
                 <<: *requires
             - prod_deploy:
                 <<: *prod-context
