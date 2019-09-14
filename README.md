@@ -25,12 +25,6 @@ This is a basic CI/CD pipeline template for projects using AWS, Terraform, and C
     - The prod_deploy job will run terraform apply in the prod context.
 6. Repeat steps 3 to 5 to code and promote changes through dev and prod.
 
-## To Do
-Only the CircleCI config has been implemented so far.
-- Create Terraform for backend
-- Create sample resources
-- Document setup instructions
-
 ## Setup
 1. Set the pipeline tag in variables.tf to the name of the project. This tag is used to name the backend resources in backend-resources.tf
 2. Modify dev.tfbackend and prod.tfbackend and set the bucket and dynamodb_table values to match the name 
@@ -47,3 +41,7 @@ terraform init -force-copy -backend-config=dev.tfbackend
 5. Repeat step 3 replacing "dev" with "prod"
 
 The backends for dev and prod are now created with remote states. 
+
+## To Do
+Only the CircleCI config has been implemented so far.
+- update with terraform 0.12 syntax

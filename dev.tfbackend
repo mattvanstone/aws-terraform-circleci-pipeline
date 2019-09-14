@@ -1,5 +1,5 @@
 # replace pipeline-example with the value set for the pipeline tag in variables.tf
-bucket         = "pipeline-example-dev-state-bucket"
+bucket         = "pipeline-example-dev-state-bucket-801bc1"
 dynamodb_table = "pipeline-example-dev-state-table"
 region         = "us-east-1"
 
