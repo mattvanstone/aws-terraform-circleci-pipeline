@@ -1,7 +1,7 @@
 variable "common_tags" {
   type = "map"
   default = {
-    pipeline = "[pipeline-name]"
+    pipeline = "pipeline-example"
   }
 }
 
@@ -39,5 +39,7 @@ variable "public" {
 }
 
 variable "access_cidr" {
-  default = ["198.48.156.73/32"]
+  type        = "list"
+  description = "The CIDR blocks for ingress security group rules"
+  default     = ["0.0.0.0/0"]
 }

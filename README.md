@@ -8,6 +8,7 @@ This is a basic CI/CD pipeline template for projects using AWS, Terraform, and C
 ## Prerequisites
 - CircleCI setup and linked to GitHub.
 - Two separate AWS accounts, one for production, and one for development.
+    - Note: This may work with both environments in one account, but you must ensure every resource that request a unique name has the `${var.env}` variable included in it.
 - One CircleCI context called production and a second called development with the following environment variables populated with the access keys for the separate AWS accounts:
     - AWS_ACCESS_KEY_ID
     - AWS_SECRET_ACCESS_KEY
