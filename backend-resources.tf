@@ -3,7 +3,7 @@
 ################
 resource "aws_s3_bucket" "tf-state-bucket" {
   # Update backend.tf with new value
-  bucket        = "${lower(lookup(var.common_tags, "pipeline"))}-${var.env}-state-bucket"
+  bucket        = "${lower(lookup(var.common_tags, "pipeline"))}-${var.env}-state-bucket-801bc1"
   force_destroy = true
   acl           = "private"
   tags          = "${var.common_tags}"
