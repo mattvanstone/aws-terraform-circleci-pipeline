@@ -1,4 +1,4 @@
-# replace [pipeline] with the value set for the pipeline tag in variables.tf
-bucket         = "pipeline-example-prod-state-bucket" // "[pipeline]-dev-state-bucket"
-dynamodb_table = "pipeline-example-prod-state-table"  // "[pipeline]-prod-state-table"
+# replace pipeline-example with the value set for the pipeline tag in variables.tf
+bucket         = "pipeline-example-prod-state-bucket"
+dynamodb_table = "pipeline-example-prod-state-table"
 region         = "us-east-1"
