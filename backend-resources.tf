@@ -6,7 +6,7 @@ resource "aws_s3_bucket" "tf-state-bucket" {
   bucket        = "${lower(lookup(var.common_tags, "pipeline"))}-${var.env}-state-bucket-801bc1"
   force_destroy = true
   acl           = "private"
-  tags          = "${var.common_tags}"
+  tags          = var.common_tags
   versioning {
     enabled = true
   }
@@ -24,5 +24,5 @@ resource "aws_dynamodb_table" "tf-state-table" {
     name = "LockID"
     type = "S"
   }
-  tags = "${var.common_tags}"
+  tags = var.common_tags
 }
