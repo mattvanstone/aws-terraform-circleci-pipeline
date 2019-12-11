@@ -11,49 +11,43 @@ data "aws_region" "current" {
 }
 
 resource "aws_vpc" "pipeline-vpc" {
-  cidr_block = "${var.vpc_cidr}"
-  tags = "${
-    merge(
-      var.common_tags,
-      map("Name", "${lookup(var.common_tags, "pipeline")}-${var.env}-vpc")
-    )
-  }"
+  cidr_block = var.vpc_cidr
+  tags = merge(
+    var.common_tags,
+    map("Name", "${lookup(var.common_tags, "pipeline")}-${var.env}-vpc")
+  )
 }
 
 resource "aws_internet_gateway" "egress" {
-  vpc_id = "${aws_vpc.pipeline-vpc.id}"
-  tags = "${
-    merge(
-      var.common_tags,
-      map("Name", "${lookup(var.common_tags, "pipeline")}-${var.env}-igw")
-    )
-  }"
+  vpc_id = aws_vpc.pipeline-vpc.id
+  tags = merge(
+    var.common_tags,
+    map("Name", "${lookup(var.common_tags, "pipeline")}-${var.env}-igw")
+  )
 }
 
 resource "aws_route" "egress_route" {
-  route_table_id         = "${aws_vpc.pipeline-vpc.default_route_table_id}"
+  route_table_id         = aws_vpc.pipeline-vpc.default_route_table_id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = "${aws_internet_gateway.egress.id}"
+  gateway_id             = aws_internet_gateway.egress.id
 }
 
 # Creating Private subnet
 resource "aws_subnet" "pipeline-subnet" {
-  vpc_id                  = "${aws_vpc.pipeline-vpc.id}"
-  count                   = "${length(var.subnets_cidrs)}"
-  cidr_block              = "${element(var.subnets_cidrs, count.index)}"
+  vpc_id                  = aws_vpc.pipeline-vpc.id
+  count                   = length(var.subnets_cidrs)
+  cidr_block              = element(var.subnets_cidrs, count.index)
   availability_zone       = "${data.aws_region.current.name}${element(var.availability_zones, count.index)}"
-  map_public_ip_on_launch = "${var.public ? true : false}"
-  tags = "${
-    merge(
-      var.common_tags,
-      map("Name", "${lookup(var.common_tags, "pipeline")}-${var.env}-subnet-${count.index}${element(var.availability_zones, count.index)}")
-    )
-  }"
+  map_public_ip_on_launch = var.public ? true : false
+  tags = merge(
+    var.common_tags,
+    map("Name", "${lookup(var.common_tags, "pipeline")}-${var.env}-subnet-${count.index}${element(var.availability_zones, count.index)}")
+  )
 }
 
 resource "aws_security_group" "pipeline-sg" {
   name   = "${lookup(var.common_tags, "pipeline")}-${var.env}-sg"
-  vpc_id = "${aws_vpc.pipeline-vpc.id}"
+  vpc_id = aws_vpc.pipeline-vpc.id
 
   egress {
     from_port   = 0
@@ -83,7 +77,7 @@ resource "aws_security_group" "pipeline-sg" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = "${var.access_cidr}"
+    cidr_blocks = var.access_cidr
     description = "HTTPS"
   }
 
@@ -91,11 +85,11 @@ resource "aws_security_group" "pipeline-sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = "${var.access_cidr}"
+    cidr_blocks = var.access_cidr
     description = "SSH"
   }
 
-  tags = "${var.common_tags}"
+  tags = var.common_tags
 }
 
 resource "aws_key_pair" "pipeline-example" {
@@ -119,19 +113,17 @@ data "aws_ami" "amazon-linux-2" {
 }
 
 resource "aws_instance" "pipeline-example" {
-  ami                         = "${data.aws_ami.amazon-linux-2.id}"
+  ami                         = data.aws_ami.amazon-linux-2.id
   associate_public_ip_address = true
   instance_type               = "t2.micro"
   key_name                    = aws_key_pair.pipeline-example.key_name
-  vpc_security_group_ids      = ["${aws_security_group.pipeline-sg.id}"]
-  subnet_id                   = "${aws_subnet.pipeline-subnet[0].id}"
+  vpc_security_group_ids      = [aws_security_group.pipeline-sg.id]
+  subnet_id                   = aws_subnet.pipeline-subnet[0].id
 
-  tags = "${
-    merge(
-      var.common_tags,
-      map("Name", "${lookup(var.common_tags, "pipeline")}-${var.env}-instance")
-    )
-  }"
+  tags = merge(
+    var.common_tags,
+    map("Name", "${lookup(var.common_tags, "pipeline")}-${var.env}-instance")
+  )
 }
 
 resource "aws_resourcegroups_group" "pipeline-example" {
