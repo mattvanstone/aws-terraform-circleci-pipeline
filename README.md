@@ -1,3 +1,4 @@
+[![CircleCI](https://circleci.com/gh/mattvanstone/aws-terraform-circleci-pipeline.svg?style=svg)](https://circleci.com/gh/mattvanstone/aws-terraform-circleci-pipeline)
 # aws-terraform-circleci-pipeline
 This is a basic CI/CD pipeline template for projects using AWS, Terraform, and CircleCI. It supports a develop branch for non-prod and a master branch for production. Commits to develop or master will run terraform apply on the associated context. Commits to any other branch will run terraform plan against the develop context. The promotion through environments is any to develop to master.
 
