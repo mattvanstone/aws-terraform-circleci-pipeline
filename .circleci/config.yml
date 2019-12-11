@@ -3,7 +3,7 @@ version: 2.1
 executors:
   terraform:
     docker:
-      - image: hashicorp/terraform:0.12.7
+      - image: hashicorp/terraform:0.12.17
 
 prod-context: &prod-context
   context: production
