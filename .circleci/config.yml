@@ -108,6 +108,48 @@ workflows:
               only:
                 - master
           <<: *requires
+
+  plan_and_apply_two:
+    description: A workflow that deploys to one environment and runs plan in the next environment.
+    jobs:
+      - repo-supervisor
+      - dev_plan:
+          <<: *dev-context
+          env: dev
+          action: plan
+          filters:
+            branches:
+              ignore:
+                - master
+                - develop
+          <<: *requires
+      - prod_plan:
+          <<: *prod-context
+          env: prod
+          action: plan
+          filters:
+            branches:
+              only:
+                - develop
+          <<: *requires
+      - dev_apply:
+          <<: *dev-context
+          env: dev
+          action: apply -auto-approve
+          filters:
+            branches:
+              only:
+                - develop
+          <<: *requires
+      - prod_apply:
+          <<: *prod-context
+          env: prod
+          action: apply -auto-approve
+          filters:
+            branches:
+              only:
+                - master
+          <<: *requires
   
   drift_detection:
     description: A scheduled workflow to run daily at 2pm UTC to detect drift in the prod environment. Job will fail if state does not match the real environment.
