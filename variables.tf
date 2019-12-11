@@ -1,5 +1,5 @@
 variable "common_tags" {
-  type = "map"
+  type = map
   default = {
     pipeline = "pipeline-example"
   }
@@ -17,7 +17,7 @@ variable "vpc_cidr" {
 }
 
 variable "subnets_cidrs" {
-  type        = "list"
+  type        = list
   description = "The CIDR block for the private subnet"
   default     = ["10.0.0.0/24", "10.0.1.0/24"]
 }
@@ -28,7 +28,7 @@ variable "net" {
 }
 
 variable "availability_zones" {
-  type        = "list"
+  type        = list
   description = "The az that the resources will be launched"
   default     = ["a", "b"]
 }
@@ -39,7 +39,7 @@ variable "public" {
 }
 
 variable "access_cidr" {
-  type        = "list"
+  type        = list
   description = "The CIDR blocks for ingress security group rules"
   default     = ["0.0.0.0/0"]
 }

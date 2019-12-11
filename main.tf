@@ -7,7 +7,7 @@ provider "aws" {
 # Sample Resources - Everything past this point is optional
 ###########################################################
 data "aws_region" "current" {
-  provider = "aws"
+  provider = aws
 }
 
 resource "aws_vpc" "pipeline-vpc" {
