@@ -33,6 +33,7 @@ workflows:
       - tf/apply:
           <<: *dev-context
           name: dev_apply
+          env: dev
           filters:
             branches:
               only:
@@ -40,6 +41,7 @@ workflows:
       - tf/apply:
           <<: *prod-context
           name: prod_apply
+          env: prod
           filters:
             branches:
               only:
@@ -58,3 +60,4 @@ workflows:
           <<: *prod-context
           name: drift_detect
           env: prod
+
