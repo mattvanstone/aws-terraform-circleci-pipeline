@@ -3,17 +3,13 @@ version: 2.1
 executors:
   terraform:
     docker:
-      - image: hashicorp/terraform:0.12.17
+      - image: hashicorp/terraform:0.12.20
 
 prod-context: &prod-context
   context: production
 
 dev-context: &dev-context
   context: development
-
-requires: &requires # If custom requires are needed this anchor reference on the job needs to be replaced with a local declaration
-  requires:
-    - repo-supervisor
 
 terraform_job: &terraform-job
   description: Run terraform plan against a specified environment.
@@ -35,21 +31,6 @@ terraform_job: &terraform-job
         command: terraform << parameters.action >> -var-file=<< parameters.env >>.tfvars -input=false
     
 jobs:
-  repo-supervisor:
-    docker:
-      - image: node:8-stretch
-    steps:
-      - checkout 
-      - run:
-          name: Install repo-supervisor
-          command: |-
-            cd ../ && git clone https://github.com/auth0/repo-supervisor.git && cd repo-supervisor
-            npm install --no-optional
-            npm run build
-      - run:
-          name: Run repo-supervisor
-          command: cd ../repo-supervisor && npm run cli ../project/
-
   dev_plan:
     <<: *terraform-job
   
@@ -70,7 +51,6 @@ workflows:
   plan:
     description: A workflow that deploys to one environment and runs plan in the next environment.
     jobs:
-      - repo-supervisor
       - dev_plan:
           <<: *dev-context
           env: dev
@@ -80,7 +60,6 @@ workflows:
               ignore:
                 - master
                 - develop
-          <<: *requires
       - prod_plan:
           <<: *prod-context
           env: prod
@@ -89,7 +68,6 @@ workflows:
             branches:
               only:
                 - develop
-          <<: *requires
 
   apply:
     description: A workflow that deploys to one environment and runs plan in the next environment.
