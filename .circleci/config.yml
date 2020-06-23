@@ -10,8 +10,8 @@ dev-context: &dev-context
   context: development
 
 workflows:
-  plan:
-    description: A workflow runs the plan job in each environment
+  terraform:
+    description: A workflow that runs the plan and apply job in each environment
     jobs:
       - tf/plan:
           <<: *dev-context
@@ -30,9 +30,6 @@ workflows:
             branches:
               only:
                 - develop
-  apply:
-    description: 
-    jobs:
       - tf/apply:
           <<: *dev-context
           name: dev_apply
