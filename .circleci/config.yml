@@ -11,7 +11,7 @@ dev-context: &dev-context
 
 workflows:
   plan:
-    description: A workflow runs the plan job in each environment
+    description: A workflow that runs the plan job in each environment
     jobs:
       - tf/plan:
           <<: *dev-context
@@ -31,7 +31,7 @@ workflows:
               only:
                 - develop
   apply:
-    description: 
+    description: A workflow that runs the apply job in each environment
     jobs:
       - tf/apply:
           <<: *dev-context
