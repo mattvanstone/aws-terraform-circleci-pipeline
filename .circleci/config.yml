@@ -35,14 +35,14 @@ workflows:
     jobs:
       - tf/apply:
           <<: *dev-context
-          name: apply
+          name: dev_apply
           filters:
             branches:
               only:
                 - develop
       - tf/apply:
           <<: *prod-context
-          name: apply
+          name: prod_apply
           filters:
             branches:
               only:
